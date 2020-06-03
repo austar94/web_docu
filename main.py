@@ -20,7 +20,7 @@ class WebControll:
 
         # chrome 웹 드라이버 생성
         # self.driver = webdriver.Chrome('C:\project\python\docu\chromedriver.exe', chrome_options=options)
-        self.driver = webdriver.Chrome('C:\project\python\docu\chromedriver.exe')
+        self.driver = webdriver.Chrome('C:\project\python\docu\chromedriver.exe')   # 81버전
         self.mainPage = ""  # 메인화면 핸들값
 
         self.targetOrg = "경기도 시립중앙도서관"  # 목표하는 기관 명
