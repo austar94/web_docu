@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+import configparser     # ini 파일 읽기용
 import time
 
 class WebControll:
@@ -18,14 +19,16 @@ class WebControll:
         # options.add_argument("lang=ko_KR")  # 가짜 플러그인 탑재
         # options.add_argument('user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')  # user-agent 이름 설정
 
-        # chrome 웹 드라이버 생성
-        # self.driver = webdriver.Chrome('C:\project\python\docu\chromedriver.exe', chrome_options=options)
-        self.driver = webdriver.Chrome('C:\project\python\docu\chromedriver.exe')   # 81버전
+        # 같은 폴더 내의 login.ini 파일을 가져옴옴
+        user = self.read_userData()
+
+        # chrome 웹 드라이버 생성 후 반환
+        self.driver = self.make_webdriver()
         self.mainPage = ""  # 메인화면 핸들값
 
         self.targetOrg = "경기도 시립중앙도서관"  # 목표하는 기관 명
-        self.userID = "fosdk@lsdi.com"
-        self.userPWD = "vidhsok23"
+        self.userID = user["id"]
+        self.userPWD = user["pw"]
         self.userType = 1   # 1: 개인 사용자 , 2: 법인, 단체 사용자
 
 
@@ -65,6 +68,7 @@ class WebControll:
             if self.driver.title == self.write_title:
                 # 문서 작성
                 self.write_doc()
+            # 비밀번호 입력이 실패할 경우
             else:
                 print(self.driver.title)
                 print(self.write_title)
@@ -136,7 +140,26 @@ class WebControll:
             self.driver.switch_to.window(handle)  # 서브 페이지로 스위칭
             self.driver.close()  # 스위칭된 페이지 종료
 
+    # webdriver 생성
+    def make_webdriver(self):
+        try:
+            # self.driver = webdriver.Chrome('C:\project\python\docu\chromedriver.exe', chrome_options=options)
+            # self.driver = webdriver.Chrome('C:\project\python\docu\chromedriver.exe')   # 81버전
+            return webdriver.Chrome('chromedriver.exe')  # 81버전
+        except Exception as e:
+            print("해당 실행파일과 같은 위치에 chromedriver.exe (81버전)을 위치해주세요.")
+            exit()
 
+    # login.ini 파일에서 유저 정보 읽어와 반환
+    def read_userData(self):
+        try:
+            config = configparser.ConfigParser()            # ini 라이브러리 사용
+            config.read("login.ini")                        # 현재 위치에서 login.ini 찾음
+            login_section = config["login_section"]         # 찾은 ini 파일에서 유저 정보있는 section 검색
+            return {"id": login_section["id"], "pw": login_section["pw"]}
+        except Exception as e:
+            print("유저 정보를 읽을 수 없습니다. 해당 실행파일과 같은 위치에 login.ini 파일을 위치해주세요.")
+            exit()
 
 web = WebControll()
 web.run()
